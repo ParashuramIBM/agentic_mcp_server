@@ -1,0 +1,12 @@
+---
+applications:
+- name: simple-mcp-cicd-server
+  memory: 512M
+  instances: 1
+  buildpack: python_buildpack
+  command: python src/server.py
+  env:
+    GITHUB_TOKEN: ${GITHUB_TOKEN}
+    RISK_AUTO_FIX_THRESHOLD: 0.3
+    RISK_HUMAN_REVIEW_THRESHOLD: 0.7
+    LOG_LEVEL: INFO

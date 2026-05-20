@@ -1,0 +1,46 @@
+name: PR CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+
+      - id: run-tests
+        name: Run tests
+        continue-on-error: true
+        run: |
+          pytest tests/ -q --junitxml=tests/results/junit.xml || true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: tests/results
+
+      - name: Run MCP scenario on failure
+        if: steps.run-tests.outcome == 'failure'
+        run: |
+          python run_scenario.py --auto
+        env:
+          # GITHUB_TOKEN is provided by Actions automatically; optionally used by scripts
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

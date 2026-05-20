@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Simple MCP CI/CD Server
+
+Parameters:
+  GitHubToken:
+    Type: String
+    NoEcho: true
+
+Resources:
+  MCPServerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../
+      Handler: src.server.handler
+      Runtime: python3.11
+      Timeout: 300
+      MemorySize: 512
+      Environment:
+        Variables:
+          GITHUB_TOKEN: !Ref GitHubToken
+          RISK_AUTO_FIX_THRESHOLD: 0.3
+          RISK_HUMAN_REVIEW_THRESHOLD: 0.7
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /mcp
+            Method: POST
+
+Outputs:
+  ApiEndpoint:
+    Description: "API endpoint for MCP server"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mcp"

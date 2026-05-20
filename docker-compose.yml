@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build: .
+    container_name: simple-mcp-cicd-server
+    ports:
+      - "8000:8000"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RISK_AUTO_FIX_THRESHOLD=${RISK_AUTO_FIX_THRESHOLD:-0.3}
+      - RISK_HUMAN_REVIEW_THRESHOLD=${RISK_HUMAN_REVIEW_THRESHOLD:-0.7}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 8000))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

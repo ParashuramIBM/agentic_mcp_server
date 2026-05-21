@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build: .
+    container_name: mcp-cicd-server
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - TEST_REPOSITORY=test-org/test-repo
+      - RISK_AUTO_FIX_THRESHOLD=0.3
+      - RISK_HUMAN_REVIEW_THRESHOLD=0.7
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./test_scenario:/app/test_scenario
+      - ./test-repo:/app/test-repo
+    networks:
+      - test-network
+
+  test-runner:
+    image: python:3.11
+    container_name: scenario-runner
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PYTHONPATH=/app
+    command: python run_scenario.py
+    depends_on:
+      - mcp-server
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

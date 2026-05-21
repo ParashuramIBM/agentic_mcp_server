@@ -1,0 +1,21 @@
+{
+  "experimental": {
+    "enableMcpServerCreation": true
+  },
+  "mcpServers": {
+    "simple-cicd-orchestrator": {
+      "command": "python",
+      "args": ["-m", "src.server"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src",
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}",
+        "RISK_AUTO_FIX_THRESHOLD": "0.3",
+        "RISK_HUMAN_REVIEW_THRESHOLD": "0.7",
+        "LOG_LEVEL": "INFO"
+      },
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  }
+}

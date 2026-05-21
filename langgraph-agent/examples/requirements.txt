@@ -1,0 +1,9 @@
+# Requirements for Agent Client Examples
+
+# Core dependencies
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Optional dependencies for advanced examples
+click>=8.1.0  # For CLI examples
+flask>=3.0.0  # For REST API examples

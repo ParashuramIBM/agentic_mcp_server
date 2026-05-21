@@ -1,0 +1,54 @@
+# Core Framework
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+langchain-community>=0.3.0
+
+# API Server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# ICA Integration
+litellm>=1.0.0
+
+# MCP (Model Context Protocol)
+mcp>=1.0.0
+requests>=2.28.0
+
+# Observability
+opentelemetry-api>=1.20.0
+opentelemetry-sdk>=1.20.0
+opentelemetry-exporter-otlp>=1.20.0
+opentelemetry-instrumentation-fastapi>=0.41b0
+opentelemetry-instrumentation-requests>=0.41b0
+
+# DevOps Tools
+GitPython>=3.1.0
+PyYAML>=6.0
+Jinja2>=3.1.0
+docker>=6.0.0
+
+# Code Analysis
+pylint>=3.0.0
+bandit>=1.7.0
+radon>=6.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+httpx>=0.27.0
+rich>=13.0.0
+aiofiles>=23.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+httpx>=0.27.0
+
+# Development
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.5.0

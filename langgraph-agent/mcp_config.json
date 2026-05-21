@@ -1,0 +1,93 @@
+{
+  "mcpServers": {
+    "langgraph-devops-agent": {
+      "command": "python",
+      "args": ["-m", "src.mcp.mcp_server"],
+      "env": {
+        "ICA_API_KEY": "735fb204-d173-487a-b86e-c4ceb5e7641c",
+        "ICA_ORGANIZATION_ID": "6a016fabe9eed92a72d7a945",
+        "ICA_PROJECT_ID": "511cd8a4-2a9a-4247-b7a2-e9fcfbead831",
+        "ICA_BASE_URL": "https://agentstudio.servicesessentials.ibm.com",
+        "AGENT_NAME": "langgraph-devops-agent",
+        "AGENT_VERSION": "1.0.0",
+        "DEFAULT_MODEL": "gpt-5.2-chat",
+        "ENVIRONMENT": "production"
+      },
+      "metadata": {
+        "name": "LangGraph DevOps Agent",
+        "version": "1.0.0",
+        "description": "Multi-agent system for DevOps automation, code review, and service orchestration",
+        "author": "IBM Consulting Advantage",
+        "capabilities": [
+          "devops_automation",
+          "code_review",
+          "service_orchestration",
+          "multi_agent_coordination"
+        ],
+        "tools": [
+          {
+            "name": "devops_automation",
+            "description": "Automate DevOps tasks (Docker, Kubernetes, CI/CD, Infrastructure)",
+            "category": "automation"
+          },
+          {
+            "name": "code_review",
+            "description": "Perform comprehensive code review and analysis",
+            "category": "quality"
+          },
+          {
+            "name": "service_orchestration",
+            "description": "Orchestrate multi-service workflows",
+            "category": "orchestration"
+          },
+          {
+            "name": "multi_agent_task",
+            "description": "Execute complex tasks with multiple agents",
+            "category": "coordination"
+          },
+          {
+            "name": "get_agent_status",
+            "description": "Get agent status and capabilities",
+            "category": "monitoring"
+          }
+        ],
+        "resources": [
+          {
+            "uri": "langgraph://agent/status",
+            "name": "Agent Status",
+            "description": "Current status of all agents"
+          },
+          {
+            "uri": "langgraph://workflow/state",
+            "name": "Workflow State",
+            "description": "Current workflow state"
+          },
+          {
+            "uri": "langgraph://execution/history",
+            "name": "Execution History",
+            "description": "Recent execution history"
+          },
+          {
+            "uri": "langgraph://config/settings",
+            "name": "Configuration",
+            "description": "Agent configuration settings"
+          }
+        ],
+        "prompts": [
+          {
+            "name": "devops_dockerfile",
+            "description": "Generate production-ready Dockerfile"
+          },
+          {
+            "name": "devops_kubernetes",
+            "description": "Generate Kubernetes manifests"
+          },
+          {
+            "name": "devops_cicd",
+            "description": "Generate CI/CD pipeline"
+          }
+        ]
+      }
+    }
+  }
+}

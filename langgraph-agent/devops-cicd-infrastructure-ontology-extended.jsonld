@@ -1,0 +1,697 @@
+{
+  "@context": {
+    "devops": "http://example.org/devops#",
+    "schema": "http://schema.org/",
+    "knowledge": "http://example.org/knowledge#",
+    "analytics": "http://example.org/analytics#",
+    "id": "@id",
+    "type": "@type",
+    "name": "schema:name",
+    "description": "schema:description",
+    "attributes": "devops:attributes",
+    "identityKey": "devops:identityKey",
+    "humanRef": "devops:humanRef",
+    "invariant": "devops:invariant",
+    "relatesTo": {
+      "@id": "devops:relatesTo",
+      "@type": "@id"
+    },
+    "from": {
+      "@id": "devops:from",
+      "@type": "@id"
+    },
+    "to": {
+      "@id": "devops:to",
+      "@type": "@id"
+    },
+    "precondition": "devops:precondition",
+    "postcondition": "devops:postcondition",
+    "Entity": "devops:Entity",
+    "Operation": "devops:Operation",
+    "KnowledgeAsset": "knowledge:KnowledgeAsset",
+    "Pattern": "analytics:Pattern",
+    "Trend": "analytics:Trend",
+    "Insight": "analytics:Insight"
+  },
+  "@graph": [
+    {
+      "id": "devops:Pipeline",
+      "type": "Entity",
+      "name": "Pipeline",
+      "description": "Represents a CI/CD pipeline definition including all stages, triggers, and configurations",
+      "identityKey": "pipelineId: UUID",
+      "humanRef": "pipelineName",
+      "attributes": {
+        "pipelineId": "string",
+        "pipelineName": "string",
+        "pipelineType": "BUILD|DEPLOY|TEST|RELEASE|FULL",
+        "triggerType": "PUSH|PULL_REQUEST|SCHEDULE|MANUAL|TAG",
+        "targetBranch": "string",
+        "status": "ACTIVE|INACTIVE|DEPRECATED",
+        "createdBy": "string",
+        "createdAt": "datetime",
+        "lastRunAt": "datetime",
+        "tool": "JENKINS|GITHUB_ACTIONS|GITLAB_CI|TEKTON|AZURE_DEVOPS|CIRCLECI",
+        "configFilePath": "string",
+        "notificationChannel": "string",
+        "timeoutMinutes": "integer",
+        "successRate": "float",
+        "averageDuration": "integer",
+        "totalRuns": "integer",
+        "failureCount": "integer",
+        "tags": "array<string>",
+        "metadata": "object"
+      },
+      "invariant": [
+        "pipelineId must be unique",
+        "pipelineName cannot be empty",
+        "triggerType must be valid",
+        "pipelineType must be valid",
+        "timeoutMinutes must be greater than 0",
+        "configFilePath must exist in repository"
+      ],
+      "relatesTo": [
+        "devops:Stage",
+        "devops:Repository",
+        "devops:Environment",
+        "devops:Artifact",
+        "devops:Guardrail",
+        "knowledge:PipelineKnowledge",
+        "analytics:PipelineMetrics"
+      ]
+    },
+    {
+      "id": "devops:Stage",
+      "type": "Entity",
+      "name": "Stage",
+      "description": "Represents a stage within a CI/CD pipeline such as build, test, scan, deploy",
+      "identityKey": "stageId: UUID",
+      "humanRef": "stageName",
+      "attributes": {
+        "stageId": "string",
+        "stageName": "string",
+        "stageType": "BUILD|UNIT_TEST|INTEGRATION_TEST|SECURITY_SCAN|CODE_QUALITY|ARTIFACT_PUBLISH|DEPLOY|SMOKE_TEST|APPROVAL|ROLLBACK|NOTIFY",
+        "order": "integer",
+        "isParallel": "boolean",
+        "isMandatory": "boolean",
+        "allowFailure": "boolean",
+        "timeoutMinutes": "integer",
+        "retryCount": "integer",
+        "runCondition": "string",
+        "environment": "string",
+        "successRate": "float",
+        "averageDuration": "integer",
+        "failurePatterns": "array<string>",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "stageId must be unique",
+        "stageName cannot be empty",
+        "order must be positive integer",
+        "stageType must be valid",
+        "isMandatory stages cannot be skipped",
+        "SECURITY_SCAN must run before DEPLOY in production pipelines",
+        "APPROVAL stage required before production deployment"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Guardrail",
+        "devops:SecurityScan",
+        "knowledge:StageKnowledge",
+        "analytics:StageMetrics"
+      ]
+    },
+    {
+      "id": "devops:Repository",
+      "type": "Entity",
+      "name": "Repository",
+      "description": "Represents a source code repository with branching strategy and governance rules",
+      "identityKey": "repoId: UUID",
+      "humanRef": "repoName",
+      "attributes": {
+        "repoId": "string",
+        "repoName": "string",
+        "repoUrl": "string",
+        "defaultBranch": "string",
+        "branchingStrategy": "GITFLOW|TRUNK_BASED|FEATURE_BRANCH|RELEASE_BRANCH",
+        "visibility": "PUBLIC|PRIVATE|INTERNAL",
+        "hasProtectedBranches": "boolean",
+        "requirePullRequest": "boolean",
+        "requireCodeReview": "boolean",
+        "minReviewerCount": "integer",
+        "requireSignedCommits": "boolean",
+        "hasSecretsScanning": "boolean",
+        "hasDependencyScanning": "boolean",
+        "language": "string",
+        "platform": "GITHUB|GITLAB|BITBUCKET|AZURE_REPOS",
+        "commitFrequency": "float",
+        "codeChurnRate": "float",
+        "contributors": "array<string>",
+        "codeQualityScore": "float",
+        "securityScore": "float",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "repoId must be unique",
+        "repoName cannot be empty",
+        "defaultBranch must be protected",
+        "requirePullRequest must be true for main and release branches",
+        "minReviewerCount must be at least 1",
+        "hasSecretsScanning must be true",
+        "secrets must never be committed to repository"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Application",
+        "devops:Team",
+        "knowledge:RepositoryKnowledge",
+        "analytics:CodeMetrics"
+      ]
+    },
+    {
+      "id": "devops:Environment",
+      "type": "Entity",
+      "name": "Environment",
+      "description": "Represents a deployment environment such as dev, staging, or production",
+      "identityKey": "environmentId: UUID",
+      "humanRef": "environmentName",
+      "attributes": {
+        "environmentId": "string",
+        "environmentName": "string",
+        "environmentType": "DEV|SIT|UAT|STAGING|PRODUCTION|DR",
+        "cloudProvider": "AWS|AZURE|GCP|IBM_CLOUD|ON_PREMISE|HYBRID",
+        "region": "string",
+        "isProduction": "boolean",
+        "requiresApproval": "boolean",
+        "approvalGroup": "string",
+        "autoDeployEnabled": "boolean",
+        "rollbackEnabled": "boolean",
+        "monitoringEnabled": "boolean",
+        "alertingEnabled": "boolean",
+        "maintenanceWindowStart": "time",
+        "maintenanceWindowEnd": "time",
+        "complianceLevel": "SOC2|PCI_DSS|HIPAA|ISO27001|NONE",
+        "uptime": "float",
+        "deploymentFrequency": "float",
+        "mttr": "integer",
+        "mtbf": "integer",
+        "costPerMonth": "float",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "environmentId must be unique",
+        "environmentName cannot be empty",
+        "isProduction environments require requiresApproval = true",
+        "isProduction environments must have monitoringEnabled = true",
+        "isProduction environments must have alertingEnabled = true",
+        "autoDeployEnabled must be false for PRODUCTION",
+        "DR environment must exist if environmentType = PRODUCTION",
+        "complianceLevel must match organizational policy"
+      ],
+      "relatesTo": [
+        "devops:Infrastructure",
+        "devops:Pipeline",
+        "devops:Deployment",
+        "devops:Guardrail",
+        "knowledge:EnvironmentKnowledge",
+        "analytics:EnvironmentMetrics"
+      ]
+    },
+    {
+      "id": "knowledge:KnowledgeAsset",
+      "type": "KnowledgeAsset",
+      "name": "Knowledge Asset",
+      "description": "Represents organizational knowledge extracted from DevOps entities and operations",
+      "identityKey": "assetId: UUID",
+      "humanRef": "assetName",
+      "attributes": {
+        "assetId": "string",
+        "assetName": "string",
+        "assetType": "BEST_PRACTICE|LESSON_LEARNED|TROUBLESHOOTING_GUIDE|RUNBOOK|ARCHITECTURE_DECISION|PATTERN|ANTI_PATTERN",
+        "category": "PIPELINE|DEPLOYMENT|SECURITY|PERFORMANCE|RELIABILITY|COST_OPTIMIZATION",
+        "content": "string",
+        "sourceEntity": "string",
+        "sourceEntityType": "string",
+        "extractedAt": "datetime",
+        "confidence": "float",
+        "applicability": "array<string>",
+        "tags": "array<string>",
+        "relatedAssets": "array<string>",
+        "usageCount": "integer",
+        "rating": "float",
+        "status": "DRAFT|REVIEWED|APPROVED|DEPRECATED"
+      },
+      "invariant": [
+        "assetId must be unique",
+        "assetName cannot be empty",
+        "assetType must be valid",
+        "confidence must be between 0 and 1",
+        "status must be valid"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Stage",
+        "devops:Repository",
+        "devops:Environment",
+        "analytics:Pattern",
+        "analytics:Insight"
+      ]
+    },
+    {
+      "id": "analytics:Pattern",
+      "type": "Pattern",
+      "name": "Pattern",
+      "description": "Represents recurring patterns identified in DevOps operations and metrics",
+      "identityKey": "patternId: UUID",
+      "humanRef": "patternName",
+      "attributes": {
+        "patternId": "string",
+        "patternName": "string",
+        "patternType": "SUCCESS|FAILURE|PERFORMANCE|SECURITY|COST|USAGE",
+        "category": "PIPELINE|DEPLOYMENT|CODE_QUALITY|INFRASTRUCTURE|TEAM_BEHAVIOR",
+        "description": "string",
+        "frequency": "integer",
+        "confidence": "float",
+        "firstObserved": "datetime",
+        "lastObserved": "datetime",
+        "affectedEntities": "array<string>",
+        "conditions": "array<object>",
+        "impact": "LOW|MEDIUM|HIGH|CRITICAL",
+        "recommendation": "string",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "patternId must be unique",
+        "patternName cannot be empty",
+        "patternType must be valid",
+        "confidence must be between 0 and 1",
+        "frequency must be positive"
+      ],
+      "relatesTo": [
+        "knowledge:KnowledgeAsset",
+        "analytics:Trend",
+        "analytics:Insight",
+        "devops:Pipeline",
+        "devops:Stage"
+      ]
+    },
+    {
+      "id": "analytics:Trend",
+      "type": "Trend",
+      "name": "Trend",
+      "description": "Represents trends and changes over time in DevOps metrics and operations",
+      "identityKey": "trendId: UUID",
+      "humanRef": "trendName",
+      "attributes": {
+        "trendId": "string",
+        "trendName": "string",
+        "trendType": "IMPROVING|DEGRADING|STABLE|VOLATILE",
+        "metric": "string",
+        "category": "PERFORMANCE|QUALITY|SECURITY|COST|RELIABILITY",
+        "timeWindow": "string",
+        "startDate": "datetime",
+        "endDate": "datetime",
+        "dataPoints": "array<object>",
+        "direction": "UPWARD|DOWNWARD|FLAT",
+        "velocity": "float",
+        "significance": "float",
+        "forecast": "array<object>",
+        "anomalies": "array<object>",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "trendId must be unique",
+        "trendName cannot be empty",
+        "trendType must be valid",
+        "significance must be between 0 and 1",
+        "startDate must be before endDate"
+      ],
+      "relatesTo": [
+        "analytics:Pattern",
+        "analytics:Insight",
+        "analytics:PipelineMetrics",
+        "analytics:EnvironmentMetrics"
+      ]
+    },
+    {
+      "id": "analytics:Insight",
+      "type": "Insight",
+      "name": "Insight",
+      "description": "Represents actionable insights derived from patterns, trends, and knowledge",
+      "identityKey": "insightId: UUID",
+      "humanRef": "insightTitle",
+      "attributes": {
+        "insightId": "string",
+        "insightTitle": "string",
+        "insightType": "OPTIMIZATION|RISK|OPPORTUNITY|ANOMALY|RECOMMENDATION",
+        "category": "PIPELINE|DEPLOYMENT|SECURITY|PERFORMANCE|COST|TEAM",
+        "description": "string",
+        "severity": "LOW|MEDIUM|HIGH|CRITICAL",
+        "confidence": "float",
+        "evidence": "array<object>",
+        "affectedEntities": "array<string>",
+        "potentialImpact": "string",
+        "recommendedActions": "array<string>",
+        "estimatedEffort": "string",
+        "estimatedValue": "string",
+        "status": "NEW|ACKNOWLEDGED|IN_PROGRESS|RESOLVED|DISMISSED",
+        "createdAt": "datetime",
+        "updatedAt": "datetime",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "insightId must be unique",
+        "insightTitle cannot be empty",
+        "insightType must be valid",
+        "confidence must be between 0 and 1",
+        "severity must be valid"
+      ],
+      "relatesTo": [
+        "analytics:Pattern",
+        "analytics:Trend",
+        "knowledge:KnowledgeAsset",
+        "devops:Pipeline",
+        "devops:Environment"
+      ]
+    },
+    {
+      "id": "analytics:PipelineMetrics",
+      "type": "Entity",
+      "name": "Pipeline Metrics",
+      "description": "Aggregated metrics and analytics for pipeline performance and reliability",
+      "identityKey": "metricsId: UUID",
+      "humanRef": "pipelineId",
+      "attributes": {
+        "metricsId": "string",
+        "pipelineId": "string",
+        "timeWindow": "string",
+        "totalRuns": "integer",
+        "successfulRuns": "integer",
+        "failedRuns": "integer",
+        "successRate": "float",
+        "averageDuration": "integer",
+        "medianDuration": "integer",
+        "p95Duration": "integer",
+        "p99Duration": "integer",
+        "timeoutRate": "float",
+        "retryRate": "float",
+        "failureReasons": "object",
+        "stageMetrics": "array<object>",
+        "costMetrics": "object",
+        "qualityMetrics": "object",
+        "trends": "array<string>",
+        "patterns": "array<string>",
+        "insights": "array<string>"
+      },
+      "invariant": [
+        "metricsId must be unique",
+        "pipelineId must reference valid pipeline",
+        "successRate must be between 0 and 1",
+        "totalRuns must equal successfulRuns + failedRuns"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "analytics:Trend",
+        "analytics:Pattern",
+        "analytics:Insight"
+      ]
+    },
+    {
+      "id": "analytics:EnvironmentMetrics",
+      "type": "Entity",
+      "name": "Environment Metrics",
+      "description": "Aggregated metrics and analytics for environment health and performance",
+      "identityKey": "metricsId: UUID",
+      "humanRef": "environmentId",
+      "attributes": {
+        "metricsId": "string",
+        "environmentId": "string",
+        "timeWindow": "string",
+        "uptime": "float",
+        "totalDeployments": "integer",
+        "successfulDeployments": "integer",
+        "failedDeployments": "integer",
+        "deploymentSuccessRate": "float",
+        "averageDeploymentDuration": "integer",
+        "mttr": "integer",
+        "mtbf": "integer",
+        "incidentCount": "integer",
+        "changeFailureRate": "float",
+        "rollbackCount": "integer",
+        "resourceUtilization": "object",
+        "costMetrics": "object",
+        "securityMetrics": "object",
+        "complianceMetrics": "object",
+        "trends": "array<string>",
+        "patterns": "array<string>",
+        "insights": "array<string>"
+      },
+      "invariant": [
+        "metricsId must be unique",
+        "environmentId must reference valid environment",
+        "uptime must be between 0 and 1",
+        "deploymentSuccessRate must be between 0 and 1"
+      ],
+      "relatesTo": [
+        "devops:Environment",
+        "analytics:Trend",
+        "analytics:Pattern",
+        "analytics:Insight"
+      ]
+    },
+    {
+      "id": "analytics:CodeMetrics",
+      "type": "Entity",
+      "name": "Code Metrics",
+      "description": "Aggregated metrics and analytics for code quality and repository health",
+      "identityKey": "metricsId: UUID",
+      "humanRef": "repositoryId",
+      "attributes": {
+        "metricsId": "string",
+        "repositoryId": "string",
+        "timeWindow": "string",
+        "totalCommits": "integer",
+        "totalPullRequests": "integer",
+        "mergedPullRequests": "integer",
+        "averageReviewTime": "integer",
+        "codeChurnRate": "float",
+        "commitFrequency": "float",
+        "activeContributors": "integer",
+        "codeQualityScore": "float",
+        "technicalDebtRatio": "float",
+        "testCoverage": "float",
+        "securityVulnerabilities": "object",
+        "dependencyHealth": "object",
+        "codeComplexity": "object",
+        "trends": "array<string>",
+        "patterns": "array<string>",
+        "insights": "array<string>"
+      },
+      "invariant": [
+        "metricsId must be unique",
+        "repositoryId must reference valid repository",
+        "codeQualityScore must be between 0 and 1",
+        "testCoverage must be between 0 and 1"
+      ],
+      "relatesTo": [
+        "devops:Repository",
+        "analytics:Trend",
+        "analytics:Pattern",
+        "analytics:Insight"
+      ]
+    },
+    {
+      "id": "knowledge:RelationshipGraph",
+      "type": "KnowledgeAsset",
+      "name": "Relationship Graph",
+      "description": "Represents the graph of relationships between DevOps entities",
+      "identityKey": "graphId: UUID",
+      "humanRef": "graphName",
+      "attributes": {
+        "graphId": "string",
+        "graphName": "string",
+        "graphType": "DEPENDENCY|IMPACT|OWNERSHIP|COMMUNICATION|WORKFLOW",
+        "nodes": "array<object>",
+        "edges": "array<object>",
+        "metadata": "object",
+        "createdAt": "datetime",
+        "updatedAt": "datetime",
+        "version": "string"
+      },
+      "invariant": [
+        "graphId must be unique",
+        "graphName cannot be empty",
+        "nodes must not be empty",
+        "edges must reference valid nodes"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Repository",
+        "devops:Environment",
+        "analytics:Pattern"
+      ]
+    },
+    {
+      "id": "devops:Artifact",
+      "type": "Entity",
+      "name": "Artifact",
+      "description": "Represents build artifacts produced by pipelines",
+      "identityKey": "artifactId: UUID",
+      "humanRef": "artifactName",
+      "attributes": {
+        "artifactId": "string",
+        "artifactName": "string",
+        "artifactType": "DOCKER_IMAGE|JAR|WAR|ZIP|TAR|NPM_PACKAGE|PYTHON_WHEEL",
+        "version": "string",
+        "size": "integer",
+        "checksum": "string",
+        "registry": "string",
+        "createdBy": "string",
+        "createdAt": "datetime",
+        "tags": "array<string>",
+        "metadata": "object"
+      },
+      "invariant": [
+        "artifactId must be unique",
+        "artifactName cannot be empty",
+        "version must follow semantic versioning",
+        "checksum must be valid"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Deployment",
+        "devops:Environment"
+      ]
+    },
+    {
+      "id": "devops:Deployment",
+      "type": "Entity",
+      "name": "Deployment",
+      "description": "Represents a deployment of an artifact to an environment",
+      "identityKey": "deploymentId: UUID",
+      "humanRef": "deploymentName",
+      "attributes": {
+        "deploymentId": "string",
+        "deploymentName": "string",
+        "artifactId": "string",
+        "environmentId": "string",
+        "pipelineId": "string",
+        "status": "PENDING|IN_PROGRESS|SUCCESS|FAILED|ROLLED_BACK",
+        "startedAt": "datetime",
+        "completedAt": "datetime",
+        "duration": "integer",
+        "deployedBy": "string",
+        "approvedBy": "string",
+        "rollbackAvailable": "boolean",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "deploymentId must be unique",
+        "artifactId must reference valid artifact",
+        "environmentId must reference valid environment",
+        "production deployments must have approvedBy"
+      ],
+      "relatesTo": [
+        "devops:Artifact",
+        "devops:Environment",
+        "devops:Pipeline",
+        "analytics:EnvironmentMetrics"
+      ]
+    },
+    {
+      "id": "devops:Team",
+      "type": "Entity",
+      "name": "Team",
+      "description": "Represents a team owning and managing DevOps resources",
+      "identityKey": "teamId: UUID",
+      "humanRef": "teamName",
+      "attributes": {
+        "teamId": "string",
+        "teamName": "string",
+        "teamType": "DEVELOPMENT|DEVOPS|SRE|SECURITY|QA|PLATFORM",
+        "members": "array<string>",
+        "lead": "string",
+        "contactChannel": "string",
+        "responsibilities": "array<string>",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "teamId must be unique",
+        "teamName cannot be empty",
+        "lead must be a team member"
+      ],
+      "relatesTo": [
+        "devops:Repository",
+        "devops:Pipeline",
+        "devops:Environment",
+        "knowledge:KnowledgeAsset"
+      ]
+    },
+    {
+      "id": "devops:Guardrail",
+      "type": "Entity",
+      "name": "Guardrail",
+      "description": "Represents policy and compliance guardrails for DevOps operations",
+      "identityKey": "guardrailId: UUID",
+      "humanRef": "guardrailName",
+      "attributes": {
+        "guardrailId": "string",
+        "guardrailName": "string",
+        "guardrailType": "SECURITY|COMPLIANCE|QUALITY|COST|PERFORMANCE",
+        "scope": "PIPELINE|STAGE|REPOSITORY|ENVIRONMENT|DEPLOYMENT",
+        "rule": "string",
+        "severity": "LOW|MEDIUM|HIGH|CRITICAL",
+        "action": "WARN|BLOCK|NOTIFY",
+        "enabled": "boolean",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "guardrailId must be unique",
+        "guardrailName cannot be empty",
+        "rule must be valid expression"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Stage",
+        "devops:Environment",
+        "knowledge:KnowledgeAsset"
+      ]
+    },
+    {
+      "id": "devops:SecurityScan",
+      "type": "Entity",
+      "name": "Security Scan",
+      "description": "Represents security scan results from various scanning tools",
+      "identityKey": "scanId: UUID",
+      "humanRef": "scanName",
+      "attributes": {
+        "scanId": "string",
+        "scanName": "string",
+        "scanType": "SAST|DAST|SCA|SECRETS|CONTAINER|INFRASTRUCTURE",
+        "tool": "string",
+        "targetEntity": "string",
+        "targetEntityType": "string",
+        "status": "PENDING|RUNNING|COMPLETED|FAILED",
+        "startedAt": "datetime",
+        "completedAt": "datetime",
+        "findings": "array<object>",
+        "criticalCount": "integer",
+        "highCount": "integer",
+        "mediumCount": "integer",
+        "lowCount": "integer",
+        "tags": "array<string>"
+      },
+      "invariant": [
+        "scanId must be unique",
+        "scanType must be valid",
+        "findings must be structured"
+      ],
+      "relatesTo": [
+        "devops:Stage",
+        "devops:Repository",
+        "analytics:Pattern",
+        "knowledge:KnowledgeAsset"
+      ]
+    }
+  ]
+}

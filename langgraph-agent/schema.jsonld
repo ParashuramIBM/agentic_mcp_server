@@ -1,0 +1,356 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "mcp": "https://modelcontextprotocol.io/schema#",
+    "ica": "https://ibm.com/consulting-advantage/schema#",
+    "devops": "https://ibm.com/devops/schema#"
+  },
+  "@graph": [
+    {
+      "@id": "ica:LangGraphDevOpsAgent",
+      "@type": "SoftwareApplication",
+      "name": "LangGraph DevOps Agent",
+      "version": "1.0.0",
+      "description": "Multi-agent system for DevOps automation, code review, and service orchestration",
+      "author": {
+        "@type": "Organization",
+        "name": "IBM Consulting Advantage"
+      },
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any",
+      "softwareRequirements": "Python 3.11+",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "devops_automation",
+        "code_review",
+        "service_orchestration",
+        "multi_agent_coordination"
+      ],
+      "hasPart": [
+        {"@id": "mcp:DevOpsAutomationTool"},
+        {"@id": "mcp:CodeReviewTool"},
+        {"@id": "mcp:ServiceOrchestrationTool"},
+        {"@id": "mcp:MultiAgentTaskTool"},
+        {"@id": "mcp:AgentStatusTool"}
+      ]
+    },
+    {
+      "@id": "mcp:DevOpsAutomationTool",
+      "@type": "SoftwareApplication",
+      "name": "DevOps Automation Tool",
+      "description": "Automate DevOps tasks including Docker, Kubernetes, CI/CD pipelines, and Infrastructure as Code",
+      "applicationCategory": "automation",
+      "potentialAction": {
+        "@type": "Action",
+        "name": "devops_automation",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "mcp://langgraph-devops-agent/tools/devops_automation",
+          "actionPlatform": [
+            "http://schema.org/DesktopWebPlatform",
+            "http://schema.org/MobileWebPlatform"
+          ]
+        },
+        "object": {
+          "@type": "Thing",
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "task",
+              "valueRequired": true,
+              "description": "The DevOps task to perform"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "environment",
+              "valueRequired": false,
+              "value": ["development", "staging", "production"],
+              "defaultValue": "production"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "context",
+              "valueRequired": false,
+              "description": "Additional context (language, framework, cloud provider)"
+            }
+          ]
+        }
+      },
+      "serviceOutput": [
+        {"@id": "devops:Dockerfile"},
+        {"@id": "devops:KubernetesManifest"},
+        {"@id": "devops:CICDPipeline"},
+        {"@id": "devops:TerraformConfig"}
+      ]
+    },
+    {
+      "@id": "mcp:CodeReviewTool",
+      "@type": "SoftwareApplication",
+      "name": "Code Review Tool",
+      "description": "Perform comprehensive code review including quality analysis, security scanning, and best practices validation",
+      "applicationCategory": "quality",
+      "potentialAction": {
+        "@type": "Action",
+        "name": "code_review",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "mcp://langgraph-devops-agent/tools/code_review"
+        },
+        "object": {
+          "@type": "Thing",
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "code",
+              "valueRequired": true,
+              "description": "The code to review"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "language",
+              "valueRequired": false,
+              "description": "Programming language"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "focus_areas",
+              "valueRequired": false,
+              "description": "Specific areas to focus on"
+            }
+          ]
+        }
+      },
+      "serviceOutput": [
+        {"@id": "devops:CodeReviewReport"},
+        {"@id": "devops:SecurityAnalysis"},
+        {"@id": "devops:QualityMetrics"}
+      ]
+    },
+    {
+      "@id": "mcp:ServiceOrchestrationTool",
+      "@type": "SoftwareApplication",
+      "name": "Service Orchestration Tool",
+      "description": "Orchestrate multi-service workflows and manage microservices coordination",
+      "applicationCategory": "orchestration",
+      "potentialAction": {
+        "@type": "Action",
+        "name": "service_orchestration",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "mcp://langgraph-devops-agent/tools/service_orchestration"
+        },
+        "object": {
+          "@type": "Thing",
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "services",
+              "valueRequired": true,
+              "description": "List of services to orchestrate"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "workflow_type",
+              "valueRequired": true,
+              "value": ["deployment", "scaling", "migration", "monitoring"]
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "requirements",
+              "valueRequired": false,
+              "description": "Orchestration requirements and constraints"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "@id": "mcp:MultiAgentTaskTool",
+      "@type": "SoftwareApplication",
+      "name": "Multi-Agent Task Tool",
+      "description": "Execute complex tasks that require coordination between multiple agents",
+      "applicationCategory": "coordination",
+      "potentialAction": {
+        "@type": "Action",
+        "name": "multi_agent_task",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "mcp://langgraph-devops-agent/tools/multi_agent_task"
+        },
+        "object": {
+          "@type": "Thing",
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "task",
+              "valueRequired": true,
+              "description": "The complex task to execute"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "agents",
+              "valueRequired": false,
+              "description": "Specific agents to involve"
+            },
+            {
+              "@type": "PropertyValue",
+              "name": "context",
+              "valueRequired": false,
+              "description": "Additional context for the task"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "@id": "mcp:AgentStatusTool",
+      "@type": "SoftwareApplication",
+      "name": "Agent Status Tool",
+      "description": "Get the current status and capabilities of all agents in the system",
+      "applicationCategory": "monitoring",
+      "potentialAction": {
+        "@type": "Action",
+        "name": "get_agent_status",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "mcp://langgraph-devops-agent/tools/get_agent_status"
+        },
+        "object": {
+          "@type": "Thing",
+          "additionalProperty": [
+            {
+              "@type": "PropertyValue",
+              "name": "agent_name",
+              "valueRequired": false,
+              "description": "Specific agent name"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "@id": "mcp:AgentStatusResource",
+      "@type": "DigitalDocument",
+      "name": "Agent Status",
+      "description": "Current status of all agents in the system",
+      "url": "langgraph://agent/status",
+      "encodingFormat": "application/json"
+    },
+    {
+      "@id": "mcp:WorkflowStateResource",
+      "@type": "DigitalDocument",
+      "name": "Workflow State",
+      "description": "Current state of the LangGraph workflow",
+      "url": "langgraph://workflow/state",
+      "encodingFormat": "application/json"
+    },
+    {
+      "@id": "mcp:ExecutionHistoryResource",
+      "@type": "DigitalDocument",
+      "name": "Execution History",
+      "description": "History of recent agent executions",
+      "url": "langgraph://execution/history",
+      "encodingFormat": "application/json"
+    },
+    {
+      "@id": "mcp:ConfigSettingsResource",
+      "@type": "DigitalDocument",
+      "name": "Configuration Settings",
+      "description": "Agent configuration and settings",
+      "url": "langgraph://config/settings",
+      "encodingFormat": "application/json"
+    },
+    {
+      "@id": "mcp:DevOpsDockerfilePrompt",
+      "@type": "CreativeWork",
+      "name": "DevOps Dockerfile Prompt",
+      "description": "Generate production-ready Dockerfile",
+      "about": "Docker containerization",
+      "keywords": ["docker", "dockerfile", "containerization"],
+      "workExample": {
+        "@type": "CreativeWork",
+        "text": "Create a production-ready Dockerfile for {language} using {framework} framework"
+      }
+    },
+    {
+      "@id": "mcp:DevOpsKubernetesPrompt",
+      "@type": "CreativeWork",
+      "name": "DevOps Kubernetes Prompt",
+      "description": "Generate Kubernetes deployment manifests",
+      "about": "Kubernetes orchestration",
+      "keywords": ["kubernetes", "k8s", "deployment", "service"],
+      "workExample": {
+        "@type": "CreativeWork",
+        "text": "Generate Kubernetes deployment and service manifests for {app_name} in {environment} environment"
+      }
+    },
+    {
+      "@id": "mcp:DevOpsCICDPrompt",
+      "@type": "CreativeWork",
+      "name": "DevOps CI/CD Prompt",
+      "description": "Generate CI/CD pipeline configuration",
+      "about": "Continuous Integration and Deployment",
+      "keywords": ["cicd", "pipeline", "automation", "github-actions", "gitlab-ci"],
+      "workExample": {
+        "@type": "CreativeWork",
+        "text": "Create a {provider} CI/CD pipeline for {language} with testing, security scanning, and deployment"
+      }
+    },
+    {
+      "@id": "devops:Dockerfile",
+      "@type": "SoftwareSourceCode",
+      "name": "Dockerfile",
+      "description": "Docker container configuration file",
+      "programmingLanguage": "Dockerfile",
+      "codeRepository": "https://github.com/docker/docker"
+    },
+    {
+      "@id": "devops:KubernetesManifest",
+      "@type": "SoftwareSourceCode",
+      "name": "Kubernetes Manifest",
+      "description": "Kubernetes resource configuration",
+      "programmingLanguage": "YAML",
+      "codeRepository": "https://github.com/kubernetes/kubernetes"
+    },
+    {
+      "@id": "devops:CICDPipeline",
+      "@type": "SoftwareSourceCode",
+      "name": "CI/CD Pipeline",
+      "description": "Continuous Integration and Deployment pipeline configuration",
+      "programmingLanguage": "YAML"
+    },
+    {
+      "@id": "devops:TerraformConfig",
+      "@type": "SoftwareSourceCode",
+      "name": "Terraform Configuration",
+      "description": "Infrastructure as Code configuration",
+      "programmingLanguage": "HCL",
+      "codeRepository": "https://github.com/hashicorp/terraform"
+    },
+    {
+      "@id": "devops:CodeReviewReport",
+      "@type": "Report",
+      "name": "Code Review Report",
+      "description": "Comprehensive code review analysis",
+      "about": "Code quality and security"
+    },
+    {
+      "@id": "devops:SecurityAnalysis",
+      "@type": "Report",
+      "name": "Security Analysis",
+      "description": "Security vulnerability assessment",
+      "about": "Application security"
+    },
+    {
+      "@id": "devops:QualityMetrics",
+      "@type": "Report",
+      "name": "Quality Metrics",
+      "description": "Code quality metrics and scores",
+      "about": "Code quality"
+    }
+  ]
+}

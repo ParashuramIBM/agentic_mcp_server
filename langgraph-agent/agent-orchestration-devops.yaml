@@ -1,0 +1,545 @@
+# Agent Orchestration YAML - DevOps Multi-Cloud Infrastructure Analyst
+# Integrates with Extended DevOps Ontology and Knowledge Management
+api-version: aiis.ibm.com/v1alpha1
+kind: agent-orchestration
+metadata:
+  name: devops-multi-cloud-infrastructure-analyst
+  platform: ica
+  framework: strands
+  version: 2.0.0
+  description: Production-grade multi-cloud infrastructure analyst with DevOps ontology integration
+  tags:
+    - devops
+    - multi-cloud
+    - infrastructure
+    - analytics
+    - knowledge-management
+spec:
+  orchestration:
+    type: single
+    timeout: 300
+    retry:
+      max-attempts: 3
+      backoff: exponential
+  
+  models:
+    - name: gpt-5.2
+      provider: ica
+      config:
+        temperature: 0.2
+        max-tokens: 4096
+        top-p: 0.95
+        frequency-penalty: 0.0
+        presence-penalty: 0.0
+  
+  # Multi-Cloud Infrastructure Tools (8 tools)
+  tools:
+    # Multi-Cloud MCP Tools
+    - name: get-resource-summary
+      type: mcp
+      tool-id: multi-cloud-mcp-get-resource-summary
+      description: Get summary of cloud resources across providers
+      required: true
+      
+    - name: get-cost-trends
+      type: mcp
+      tool-id: multi-cloud-mcp-get-cost-trends
+      description: Analyze cost trends over time
+      required: true
+      
+    - name: get-cost-anomaly
+      type: mcp
+      tool-id: multi-cloud-mcp-get-cost-anomaly
+      description: Detect cost anomalies and unusual spending
+      required: true
+      
+    - name: get-new-resources-since
+      type: mcp
+      tool-id: multi-cloud-mcp-get-new-resources-since
+      description: Find resources created since a specific date
+      required: false
+      
+    - name: find-idle-resources
+      type: mcp
+      tool-id: multi-cloud-mcp-find-idle-resources
+      description: Identify idle or underutilized resources
+      required: true
+      
+    - name: check-compliance
+      type: mcp
+      tool-id: multi-cloud-mcp-check-compliance
+      description: Check compliance with policies and standards
+      required: true
+      
+    - name: get-top-expensive-resources
+      type: mcp
+      tool-id: multi-cloud-mcp-get-top-expensive-resources
+      description: Get most expensive resources
+      required: true
+      
+    - name: get-budget-health
+      type: mcp
+      tool-id: multi-cloud-mcp-get-budget-health
+      description: Check budget health and utilization
+      required: true
+    
+    # Context Studio Policy Tools (7 tools)
+    - name: context-policies-vector-query
+      type: mcp
+      tool-id: multicloudintel-policies-context-broker-vector-query
+      description: Query policies using vector similarity search
+      required: true
+      
+    - name: context-policies-graph-query
+      type: mcp
+      tool-id: multicloudintel-policies-context-broker-graph-query
+      description: Query policy relationships using graph traversal
+      required: true
+      
+    - name: context-policies-hybrid-query
+      type: mcp
+      tool-id: multicloudintel-policies-context-broker-hybrid-query
+      description: Hybrid query combining vector and graph search
+      required: true
+      
+    - name: get-context-metadata
+      type: mcp
+      tool-id: multicloudintel-policies-context-broker-get-context-metadata
+      description: Get metadata about policy context
+      required: false
+      
+    - name: get-context-schema
+      type: mcp
+      tool-id: multicloudintel-policies-context-broker-get-context-schema
+      description: Get schema definition for policy context
+      required: false
+      
+    - name: context-policies-post-events
+      type: mcp
+      tool-id: multicloudintel-policies-context-broker-post-events
+      description: Post events to policy context
+      required: false
+      
+    - name: context-policies-get-context-id
+      type: mcp
+      tool-id: multicloudintel-policies-context-broker-get-contexts
+      description: Get available policy contexts
+      required: false
+    
+    # DevOps Ontology Tools (Extended)
+    - name: query-knowledge-assets
+      type: custom
+      description: Query knowledge assets from DevOps ontology
+      endpoint: /api/knowledge/query
+      method: POST
+      
+    - name: detect-patterns
+      type: custom
+      description: Detect patterns in infrastructure operations
+      endpoint: /api/analytics/patterns
+      method: POST
+      
+    - name: analyze-trends
+      type: custom
+      description: Analyze trends in metrics and operations
+      endpoint: /api/analytics/trends
+      method: POST
+      
+    - name: generate-insights
+      type: custom
+      description: Generate actionable insights from data
+      endpoint: /api/analytics/insights
+      method: POST
+      
+    - name: get-pipeline-metrics
+      type: custom
+      description: Get pipeline performance metrics
+      endpoint: /api/metrics/pipeline
+      method: GET
+      
+    - name: get-environment-metrics
+      type: custom
+      description: Get environment health metrics
+      endpoint: /api/metrics/environment
+      method: GET
+      
+    - name: check-guardrails
+      type: custom
+      description: Check policy guardrails compliance
+      endpoint: /api/guardrails/check
+      method: POST
+  
+  # Agent Configuration
+  agents:
+    - name: devops-multi-cloud-infra-analyst
+      type: supervisor
+      role: DevOps Multi-Cloud Infrastructure Analyst
+      model: gpt-5.2
+      
+      # Agent Instructions
+      instructions: |
+        You are a production-grade DevOps multi-cloud infrastructure analyst with deep knowledge of:
+        - Multi-cloud infrastructure (AWS, Azure, GCP, IBM Cloud)
+        - DevOps best practices and patterns
+        - Cost optimization and resource management
+        - Security and compliance
+        - Performance monitoring and optimization
+        
+        MANDATORY EXECUTION ORDER:
+        1. Query Context Studio FIRST for policies using context-policies-* tools
+        2. Query DevOps Knowledge Assets for relevant best practices and lessons learned
+        3. Call infrastructure tools (get-resource-summary, get-cost-trends, etc.)
+        4. Detect patterns and analyze trends using analytics tools
+        5. Generate actionable insights with recommendations
+        6. Check guardrails and compliance
+        7. Provide comprehensive analysis with tool trace
+        
+        FIXED CONTEXT:
+        - context_id: ctx_eeac88f77918
+        - AgentPersona: multi-cloud-infrastructure-analyst
+        - Ontology: devops-cicd-infrastructure-ontology-extended.jsonld
+        
+        KNOWLEDGE INTEGRATION:
+        - Always check for relevant knowledge assets before making recommendations
+        - Reference patterns and trends from historical data
+        - Apply best practices from knowledge base
+        - Learn from past incidents and lessons learned
+        
+        ANALYSIS FRAMEWORK:
+        1. Resource Analysis
+           - Inventory and classification
+           - Utilization and efficiency
+           - Cost allocation and trends
+        
+        2. Pattern Detection
+           - Success patterns (what works well)
+           - Failure patterns (common issues)
+           - Cost patterns (spending trends)
+           - Security patterns (vulnerability trends)
+        
+        3. Trend Analysis
+           - Performance trends (improving/degrading)
+           - Cost trends (increasing/decreasing)
+           - Compliance trends (violations over time)
+           - Resource growth trends
+        
+        4. Insight Generation
+           - Optimization opportunities
+           - Risk identification
+           - Cost savings recommendations
+           - Security improvements
+           - Compliance gaps
+        
+        5. Guardrail Validation
+           - Policy compliance check
+           - Security posture assessment
+           - Cost threshold validation
+           - Resource limit enforcement
+        
+        OUTPUT FORMAT:
+        Always provide:
+        1. Executive Summary
+        2. Key Findings (with severity: CRITICAL, HIGH, MEDIUM, LOW)
+        3. Detailed Analysis
+        4. Actionable Recommendations (with effort and value estimates)
+        5. Tool Trace (which tools were called and why)
+        6. Knowledge References (relevant assets used)
+        7. Next Steps
+        
+        SEVERITY LEVELS:
+        - CRITICAL: Immediate action required (< 4 hours)
+        - HIGH: Action required within 24 hours
+        - MEDIUM: Action required within 1 week
+        - LOW: Action required within 2 weeks
+        
+        Always include confidence scores (0-1) for insights and recommendations.
+      
+      # Agent Context
+      context:
+        ontology:
+          file: devops-cicd-infrastructure-ontology-extended.jsonld
+          version: 2.0.0
+          entities:
+            - Pipeline
+            - Stage
+            - Repository
+            - Environment
+            - KnowledgeAsset
+            - Pattern
+            - Trend
+            - Insight
+            - PipelineMetrics
+            - EnvironmentMetrics
+            - CodeMetrics
+            - Artifact
+            - Deployment
+            - Team
+            - Guardrail
+            - SecurityScan
+        
+        policies:
+          directory: policies/
+          files:
+            - PIPELINE_POLICY.md
+            - STAGE_POLICY.md
+            - REPOSITORY_POLICY.md
+            - ENVIRONMENT_POLICY.md
+            - KNOWLEDGE_ASSET_POLICY.md
+            - EXTENDED_ENTITIES_POLICIES.md
+        
+        knowledge_base:
+          enabled: true
+          confidence_threshold: 0.7
+          max_results: 10
+        
+        analytics:
+          pattern_detection:
+            enabled: true
+            min_frequency: 3
+            min_confidence: 0.7
+          
+          trend_analysis:
+            enabled: true
+            time_windows: [7d, 30d, 90d]
+            min_significance: 0.8
+          
+          insight_generation:
+            enabled: true
+            min_confidence: 0.7
+            prioritization: severity
+        
+        guardrails:
+          enabled: true
+          enforcement: strict
+          categories:
+            - SECURITY
+            - COMPLIANCE
+            - COST
+            - PERFORMANCE
+            - QUALITY
+      
+      # Agent Capabilities
+      capabilities:
+        - multi-cloud-analysis
+        - cost-optimization
+        - security-assessment
+        - compliance-checking
+        - performance-monitoring
+        - pattern-detection
+        - trend-forecasting
+        - insight-generation
+        - knowledge-management
+        - guardrail-enforcement
+      
+      # Agent Workflows
+      workflows:
+        - name: infrastructure-health-check
+          description: Comprehensive infrastructure health assessment
+          steps:
+            - Query policies from Context Studio
+            - Get resource summary
+            - Check compliance
+            - Analyze cost trends
+            - Detect anomalies
+            - Find idle resources
+            - Generate insights
+            - Check guardrails
+            - Provide recommendations
+        
+        - name: cost-optimization-analysis
+          description: Identify cost optimization opportunities
+          steps:
+            - Query cost policies
+            - Get cost trends
+            - Detect cost anomalies
+            - Find idle resources
+            - Get top expensive resources
+            - Check budget health
+            - Query knowledge for cost patterns
+            - Generate cost insights
+            - Provide savings recommendations
+        
+        - name: security-compliance-audit
+          description: Security and compliance assessment
+          steps:
+            - Query security policies
+            - Check compliance status
+            - Run security scans
+            - Detect security patterns
+            - Analyze vulnerability trends
+            - Check security guardrails
+            - Query security knowledge
+            - Generate security insights
+            - Provide remediation steps
+        
+        - name: performance-optimization
+          description: Performance analysis and optimization
+          steps:
+            - Query performance policies
+            - Get environment metrics
+            - Get pipeline metrics
+            - Detect performance patterns
+            - Analyze performance trends
+            - Query performance knowledge
+            - Generate optimization insights
+            - Provide tuning recommendations
+      
+      # Agent Metrics
+      metrics:
+        track:
+          - analysis_duration
+          - tools_called
+          - insights_generated
+          - recommendations_provided
+          - confidence_scores
+          - knowledge_assets_used
+          - patterns_detected
+          - trends_identified
+        
+        targets:
+          analysis_duration: < 60s
+          insights_generated: >= 5
+          confidence_score: >= 0.8
+          knowledge_reuse: >= 3
+  
+  # Execution Configuration
+  execution:
+    mode: sequential
+    parallel_limit: 5
+    timeout_per_tool: 30
+    retry_on_failure: true
+    
+    error_handling:
+      strategy: graceful-degradation
+      fallback: partial-results
+      log_errors: true
+    
+    caching:
+      enabled: true
+      ttl: 300
+      invalidate_on_update: true
+  
+  # Monitoring and Observability
+  monitoring:
+    enabled: true
+    
+    metrics:
+      - name: agent_invocations
+        type: counter
+      - name: tool_calls
+        type: counter
+      - name: analysis_duration
+        type: histogram
+      - name: insight_confidence
+        type: gauge
+      - name: knowledge_reuse_rate
+        type: gauge
+    
+    logging:
+      level: INFO
+      format: json
+      destinations:
+        - stdout
+        - file: /var/log/agents/devops-analyst.log
+    
+    tracing:
+      enabled: true
+      sampler: always
+      exporter: jaeger
+  
+  # Security Configuration
+  security:
+    authentication:
+      type: bearer-token
+      required: true
+    
+    authorization:
+      type: rbac
+      roles:
+        - admin
+        - analyst
+        - viewer
+    
+    encryption:
+      in_transit: true
+      at_rest: true
+    
+    audit:
+      enabled: true
+      log_all_operations: true
+      retention_days: 90
+  
+  # Integration Configuration
+  integrations:
+    - name: context-studio
+      type: mcp
+      endpoint: https://agentstudio.servicesessentials.ibm.com
+      context_id: ctx_eeac88f77918
+      
+    - name: multi-cloud-mcp
+      type: mcp
+      endpoint: https://multi-cloud-mcp.example.com
+      
+    - name: devops-ontology
+      type: rest-api
+      endpoint: https://ontology-api.example.com
+      
+    - name: knowledge-base
+      type: rest-api
+      endpoint: https://knowledge-api.example.com
+      
+    - name: analytics-engine
+      type: rest-api
+      endpoint: https://analytics-api.example.com
+      
+    - name: guardrail-service
+      type: rest-api
+      endpoint: https://guardrails-api.example.com
+  
+  # Notification Configuration
+  notifications:
+    enabled: true
+    
+    channels:
+      - type: slack
+        webhook: https://hooks.slack.com/services/xxx
+        events:
+          - critical-insight
+          - high-severity-finding
+          - compliance-violation
+      
+      - type: email
+        recipients:
+          - devops-team@example.com
+          - sre-team@example.com
+        events:
+          - daily-summary
+          - weekly-report
+      
+      - type: pagerduty
+        integration_key: xxx
+        events:
+          - critical-insight
+          - security-incident
+  
+  # Scheduling Configuration
+  scheduling:
+    enabled: true
+    
+    jobs:
+      - name: daily-health-check
+        workflow: infrastructure-health-check
+        schedule: "0 9 * * *"  # 9 AM daily
+        timezone: UTC
+      
+      - name: weekly-cost-analysis
+        workflow: cost-optimization-analysis
+        schedule: "0 10 * * 1"  # 10 AM Monday
+        timezone: UTC
+      
+      - name: monthly-compliance-audit
+        workflow: security-compliance-audit
+        schedule: "0 11 1 * *"  # 11 AM 1st of month
+        timezone: UTC
+
+# Made with Bob

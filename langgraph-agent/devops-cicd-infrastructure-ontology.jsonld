@@ -1,0 +1,184 @@
+{
+  "@context": {
+    "devops": "http://example.org/devops#",
+    "schema": "http://schema.org/",
+    "id": "@id",
+    "type": "@type",
+    "name": "schema:name",
+    "description": "schema:description",
+    "attributes": "devops:attributes",
+    "identityKey": "devops:identityKey",
+    "humanRef": "devops:humanRef",
+    "invariant": "devops:invariant",
+    "relatesTo": {
+      "@id": "devops:relatesTo",
+      "@type": "@id"
+    },
+    "from": {
+      "@id": "devops:from",
+      "@type": "@id"
+    },
+    "to": {
+      "@id": "devops:to",
+      "@type": "@id"
+    },
+    "precondition": "devops:precondition",
+    "postcondition": "devops:postcondition",
+    "Entity": "devops:Entity",
+    "Operation": "devops:Operation"
+  },
+  "@graph": [
+    {
+      "id": "devops:Pipeline",
+      "type": "Entity",
+      "name": "Pipeline",
+      "description": "Represents a CI/CD pipeline definition including all stages, triggers, and configurations",
+      "identityKey": "pipelineId: UUID",
+      "humanRef": "pipelineName",
+      "attributes": {
+        "pipelineId": "string",
+        "pipelineName": "string",
+        "pipelineType": "BUILD|DEPLOY|TEST|RELEASE|FULL",
+        "triggerType": "PUSH|PULL_REQUEST|SCHEDULE|MANUAL|TAG",
+        "targetBranch": "string",
+        "status": "ACTIVE|INACTIVE|DEPRECATED",
+        "createdBy": "string",
+        "createdAt": "datetime",
+        "lastRunAt": "datetime",
+        "tool": "JENKINS|GITHUB_ACTIONS|GITLAB_CI|TEKTON|AZURE_DEVOPS|CIRCLECI",
+        "configFilePath": "string",
+        "notificationChannel": "string",
+        "timeoutMinutes": "integer"
+      },
+      "invariant": [
+        "pipelineId must be unique",
+        "pipelineName cannot be empty",
+        "triggerType must be valid",
+        "pipelineType must be valid",
+        "timeoutMinutes must be greater than 0",
+        "configFilePath must exist in repository"
+      ],
+      "relatesTo": [
+        "devops:Stage",
+        "devops:Repository",
+        "devops:Environment",
+        "devops:Artifact",
+        "devops:Guardrail"
+      ]
+    },
+    {
+      "id": "devops:Stage",
+      "type": "Entity",
+      "name": "Stage",
+      "description": "Represents a stage within a CI/CD pipeline such as build, test, scan, deploy",
+      "identityKey": "stageId: UUID",
+      "humanRef": "stageName",
+      "attributes": {
+        "stageId": "string",
+        "stageName": "string",
+        "stageType": "BUILD|UNIT_TEST|INTEGRATION_TEST|SECURITY_SCAN|CODE_QUALITY|ARTIFACT_PUBLISH|DEPLOY|SMOKE_TEST|APPROVAL|ROLLBACK|NOTIFY",
+        "order": "integer",
+        "isParallel": "boolean",
+        "isMandatory": "boolean",
+        "allowFailure": "boolean",
+        "timeoutMinutes": "integer",
+        "retryCount": "integer",
+        "runCondition": "string",
+        "environment": "string"
+      },
+      "invariant": [
+        "stageId must be unique",
+        "stageName cannot be empty",
+        "order must be positive integer",
+        "stageType must be valid",
+        "isMandatory stages cannot be skipped",
+        "SECURITY_SCAN must run before DEPLOY in production pipelines",
+        "APPROVAL stage required before production deployment"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Guardrail",
+        "devops:SecurityScan"
+      ]
+    },
+    {
+      "id": "devops:Repository",
+      "type": "Entity",
+      "name": "Repository",
+      "description": "Represents a source code repository with branching strategy and governance rules",
+      "identityKey": "repoId: UUID",
+      "humanRef": "repoName",
+      "attributes": {
+        "repoId": "string",
+        "repoName": "string",
+        "repoUrl": "string",
+        "defaultBranch": "string",
+        "branchingStrategy": "GITFLOW|TRUNK_BASED|FEATURE_BRANCH|RELEASE_BRANCH",
+        "visibility": "PUBLIC|PRIVATE|INTERNAL",
+        "hasProtectedBranches": "boolean",
+        "requirePullRequest": "boolean",
+        "requireCodeReview": "boolean",
+        "minReviewerCount": "integer",
+        "requireSignedCommits": "boolean",
+        "hasSecretsScanning": "boolean",
+        "hasDependencyScanning": "boolean",
+        "language": "string",
+        "platform": "GITHUB|GITLAB|BITBUCKET|AZURE_REPOS"
+      },
+      "invariant": [
+        "repoId must be unique",
+        "repoName cannot be empty",
+        "defaultBranch must be protected",
+        "requirePullRequest must be true for main and release branches",
+        "minReviewerCount must be at least 1",
+        "hasSecretsScanning must be true",
+        "secrets must never be committed to repository"
+      ],
+      "relatesTo": [
+        "devops:Pipeline",
+        "devops:Application",
+        "devops:Team"
+      ]
+    },
+    {
+      "id": "devops:Environment",
+      "type": "Entity",
+      "name": "Environment",
+      "description": "Represents a deployment environment such as dev, staging, or production",
+      "identityKey": "environmentId: UUID",
+      "humanRef": "environmentName",
+      "attributes": {
+        "environmentId": "string",
+        "environmentName": "string",
+        "environmentType": "DEV|SIT|UAT|STAGING|PRODUCTION|DR",
+        "cloudProvider": "AWS|AZURE|GCP|IBM_CLOUD|ON_PREMISE|HYBRID",
+        "region": "string",
+        "isProduction": "boolean",
+        "requiresApproval": "boolean",
+        "approvalGroup": "string",
+        "autoDeployEnabled": "boolean",
+        "rollbackEnabled": "boolean",
+        "monitoringEnabled": "boolean",
+        "alertingEnabled": "boolean",
+        "maintenanceWindowStart": "time",
+        "maintenanceWindowEnd": "time",
+        "complianceLevel": "SOC2|PCI_DSS|HIPAA|ISO27001|NONE"
+      },
+      "invariant": [
+        "environmentId must be unique",
+        "environmentName cannot be empty",
+        "isProduction environments require requiresApproval = true",
+        "isProduction environments must have monitoringEnabled = true",
+        "isProduction environments must have alertingEnabled = true",
+        "autoDeployEnabled must be false for PRODUCTION",
+        "DR environment must exist if environmentType = PRODUCTION",
+        "complianceLevel must match organizational policy"
+      ],
+      "relatesTo": [
+        "devops:Infrastructure",
+        "devops:Pipeline",
+        "devops:Deployment",
+        "devops:Guardrail"
+      ]
+    }]
+}

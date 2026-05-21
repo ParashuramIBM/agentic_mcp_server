@@ -1,0 +1,111 @@
+{
+  "agent_name": "agentic-devops-langgraph-react",
+  "agent_version": "1.0.0",
+  "agent_description": "LangGraph ReAct multi-agent system for DevOps automation, code review, and service orchestration. Iteratively analyzes DevOps workflows, proposes agent roles and orchestration patterns, and refines designs based on user feedback.",
+  "framework": "langgraph",
+  "platform": "enterprise_advantage",
+  "orchestration_pattern": "react",
+  "model": "gpt-5.2-chat",
+  "capabilities": [
+    "devops_automation",
+    "code_review",
+    "service_orchestration",
+    "multi_agent_coordination",
+    "docker_containerization",
+    "kubernetes_deployment",
+    "ci_cd_pipeline_generation",
+    "infrastructure_as_code",
+    "monitoring_setup"
+  ],
+  "agents": [
+    {
+      "name": "supervisor",
+      "type": "router",
+      "description": "Analyzes requests and routes to specialized agents",
+      "capabilities": [
+        "request_analysis",
+        "intelligent_routing",
+        "result_aggregation",
+        "multi_agent_coordination"
+      ]
+    },
+    {
+      "name": "devops_agent",
+      "type": "executor",
+      "description": "Handles CI/CD, Docker, Kubernetes, infrastructure provisioning",
+      "capabilities": [
+        "dockerfile_generation",
+        "kubernetes_manifest_creation",
+        "ci_cd_pipeline_setup",
+        "infrastructure_provisioning",
+        "monitoring_configuration"
+      ]
+    },
+    {
+      "name": "code_review_agent",
+      "type": "executor",
+      "description": "Code analysis, security scanning, and best practices enforcement",
+      "capabilities": [
+        "code_quality_analysis",
+        "security_vulnerability_scanning",
+        "best_practices_checking",
+        "documentation_generation"
+      ],
+      "status": "planned"
+    },
+    {
+      "name": "orchestrator_agent",
+      "type": "executor",
+      "description": "Microservices coordination and workflow management",
+      "capabilities": [
+        "service_coordination",
+        "workflow_management",
+        "event_driven_patterns",
+        "service_mesh_configuration"
+      ],
+      "status": "planned"
+    }
+  ],
+  "endpoints": {
+    "invoke": "/agent/invoke",
+    "stream": "/agent/stream",
+    "status": "/agent/status",
+    "capabilities": "/agent/capabilities",
+    "a2a": "/a2a/invoke",
+    "health": "/health"
+  },
+  "integration": {
+    "mcp_gateway": {
+      "name": "ICA Shared MCP Gateway",
+      "url": "https://ica-pr-us-south-global-83f075ec965da16d61cd1225fb631fe-0007.us-south.containers.appdomain.cloud",
+      "status": "active"
+    },
+    "workflow_orchestrator": {
+      "name": "AgentCore Orchestrator",
+      "url": "https://langflow.servicesessentials.ibm.com",
+      "status": "active"
+    },
+    "observability": {
+      "provider": "Arize Phoenix",
+      "url": "https://observability.servicesessentials.ibm.com",
+      "status": "active"
+    }
+  },
+  "deployment": {
+    "type": "containerized",
+    "runtime": "docker",
+    "orchestration": "kubernetes",
+    "health_check": "/health",
+    "readiness_probe": "/agent/status"
+  },
+  "tags": [
+    "devops",
+    "automation",
+    "langgraph",
+    "react",
+    "multi-agent",
+    "enterprise"
+  ],
+  "created_at": "2026-05-19T17:48:00Z",
+  "updated_at": "2026-05-19T17:48:00Z"
+}
